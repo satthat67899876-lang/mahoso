@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mã hồ sơ CCHC 3.0</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#eef3f8;display:flex;align-items:center;justify-content:center;min-height:100vh}
+.card{background:#fff;width:min(430px,95vw);padding:24px;border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.15);text-align:center}
+h1{margin:0;color:#0d47a1}
+#today{margin:8px 0 18px;color:#666}
+#prefix{font-size:28px;font-weight:bold;color:#c62828;word-break:break-all}
+input{margin-top:18px;width:120px;font-size:34px;text-align:center;padding:10px;border-radius:10px;border:2px solid #1976d2}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+button{padding:15px;border:none;border-radius:10px;font-size:18px;color:#fff;cursor:pointer}
+.copy{background:#1565c0}.plus{background:#2e7d32}
+#msg{height:28px;margin-top:16px;color:#2e7d32;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>📋 MÃ HỒ SƠ</h1>
+<div id="today"></div>
+<div id="prefix"></div>
+<input id="stt" maxlength="2" inputmode="numeric" placeholder="22">
+<div class="buttons">
+<button class="copy" onclick="copyCode()">📋 COPY</button>
+<button class="plus" onclick="incCopy()">➕ +1</button>
+</div>
+<div id="msg"></div>
+</div>
+<script>
+const FIX1="G01.817.816";
+const FIX2="8900";
+function prefix(){
+ const d=new Date();
+ const yy=String(d.getFullYear()).slice(-2);
+ const mm=String(d.getMonth()+1).padStart(2,'0');
+ const dd=String(d.getDate()).padStart(2,'0');
+ document.getElementById('today').textContent="Hôm nay: "+d.toLocaleDateString('vi-VN');
+ return `${FIX1}-${yy}${mm}${dd}-${FIX2}`;
+}
+let p=prefix();
+document.getElementById('prefix').textContent=p;
+const i=document.getElementById('stt'); i.focus();
+function notify(t){msg.textContent=t;setTimeout(()=>msg.textContent="",1200);if(navigator.vibrate)navigator.vibrate(50);}
+async function copyCode(){
+ let v=i.value.replace(/\D/g,'');
+ if(!v){alert("Nhập số thứ tự.");i.focus();return;}
+ if(+v>99){alert("Tối đa 2 số.");return;}
+ v=v.padStart(2,'0');
+ const full=p+v;
+ await navigator.clipboard.writeText(full);
+ notify("✅ "+full);
+ i.value="";i.focus();
+}
+async function incCopy(){
+ let v=i.value?parseInt(i.value,10):0;
+ if(v<99)v++;
+ i.value=String(v).padStart(2,'0');
+ await copyCode();
+}
+i.addEventListener('keydown',e=>{if(e.key==="Enter")copyCode();});
+i.addEventListener('input',()=>i.value=i.value.replace(/\D/g,'').slice(0,2));
+</script>
+</body>
+</html>
